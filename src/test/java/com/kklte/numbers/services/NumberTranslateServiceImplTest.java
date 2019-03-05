@@ -77,7 +77,7 @@ public class NumberTranslateServiceImplTest extends ApplicationTest {
                 "Two million six hundred thousand one hundred and seventy two",
                 "Thirty million two hundred and sixty one",
                 "Eighty million three hundred and forty three",
-                "Three hundred million four hundred and twenty three thousand and fifty two",
+                "Three hundred million four hundred twenty three thousand and fifty two",
                 "Two hundred and forty six billion"
         };
         final String[] actual = Stream.of(52423L, 700006L, 400800L, 2600172L, 30000261L, 80000343L, 300423052L,

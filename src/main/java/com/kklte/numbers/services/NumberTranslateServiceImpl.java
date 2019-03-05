@@ -41,12 +41,12 @@ public class NumberTranslateServiceImpl implements INumberTranslateService {
     }
 
     /**
-     * (non-Javadoc)
-     *
-     * @see com.kklte.numbers.services.INumberTranslateService#translate(Long)
+     * Translates a number into its string representation (i.e. 20 -> twenty)
+     * @param number A number up to one trillion.
+     * @param withAnd Whether to include the 'and' keyword in the name (i.e. four hundred and seventy two vs four hundred seventy two)
+     * @return The number's name.
      */
-    @Override
-    public String translate(final Long number) {
+    private String translate(final Long number, final boolean withAnd) {
         final boolean isPositive = number >= 0;
         final StringJoiner objNameBuilder = new StringJoiner(" ");
 
@@ -63,15 +63,17 @@ public class NumberTranslateServiceImpl implements INumberTranslateService {
             if (NumberUtils.compare(objHeadEntry.getKey(), 0) != 0) {
                 final Long modHeadNumber = Math.floorMod(remainingNumber, objHeadEntry.getKey());
                 final Long quantifier = (remainingNumber - modHeadNumber) / objHeadEntry.getKey();
+                final Long nextRemainingNumber = remainingNumber - objHeadEntry.getKey() * quantifier;
 
                 if (remainingNumber >= 100) {
-                    objNameBuilder.add(translate(quantifier).toLowerCase());
-                } else if (isLargerThanHundred) {
+                    final boolean includeAnd = NumberUtils.compare(nextRemainingNumber, 0) == 0;
+                    objNameBuilder.add(translate(quantifier, includeAnd).toLowerCase());
+                } else if (isLargerThanHundred && withAnd) {
                    objNameBuilder.add(AND);
                 }
 
                 isLargerThanHundred = remainingNumber >= 100;
-                remainingNumber -= objHeadEntry.getKey() * quantifier;
+                remainingNumber = nextRemainingNumber;
             }
 
             objNameBuilder.add(objHeadEntry.getValue());
@@ -79,6 +81,16 @@ public class NumberTranslateServiceImpl implements INumberTranslateService {
         } while (remainingNumber > 0);
 
         return StringUtils.capitalize(objNameBuilder.toString());
+    }
+
+    /**
+     * (non-Javadoc)
+     *
+     * @see com.kklte.numbers.services.INumberTranslateService#translate(Long)
+     */
+    @Override
+    public String translate(Long number) {
+        return translate(number, true);
     }
 
     /**
